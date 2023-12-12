@@ -70,9 +70,8 @@ $installProcess = Start-Process $installer.FullName `
   -ArgumentList "--quiet --license=$($license.FullName) --arguments=$($tmp)Arguments.xml" `
   -PassThru `
   -Verb runAs;
-  Wait-Process $installProcess.Id;
 
-$installProcess.ExitCode
+$installProcess.WaitForExit();
 
 Write-Output "Installation of XP"
 
@@ -86,8 +85,10 @@ $securePassword = ConvertTo-SecureString $Password -AsPlainText -Force
 $c = New-Object System.Management.Automation.PSCredential($Username, $securePassword)
 
 # Start the PowerShell process with the specified script and credentials
-$sP = Start-Process PowerShell -ArgumentList "-File C:\tmp\setup.ps1" -Credential $c -Wait
+$sP = Start-Process PowerShell -ArgumentList "-File C:\tmp\setup.ps1" `
+-Credential $c `
+-PassThru;
 
-Wait-Process $sP.Id;
+$sP.WaitForExit();
 
-Write-Output "Generated the argument file"
+Write-Output "All done"
