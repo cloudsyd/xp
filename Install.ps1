@@ -65,6 +65,17 @@ $argumentsXml.ArgumentsXmlV2.Arguments.AppendChild($newElement)
 
 # Save arguments file with modified user data
 $argumentsXml.Save("$($tmp)Arguments.xml");
+
+$installProcess = Start-Process $installer.FullName `
+  -ArgumentList "--quiet --license=$($license.FullName) --arguments=$($tmp)Arguments.xml" `
+  -PassThru `
+  -Verb runAs;
+  Wait-Process $installProcess.Id;
+
+$installProcess.ExitCode
+
+Write-Output "Installation of XP"
+
 }
 $block > C:\tmp\setup.ps1
 
