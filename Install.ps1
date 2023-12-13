@@ -82,7 +82,7 @@ if ($result -eq "false")
 {
 throw "Error occured during the installation of Milestone XProtect - please check the logs for more information"
 }
-
+exit 0
 Restart-Computer -Force
 
 }
@@ -104,6 +104,8 @@ $sP = Start-Process PowerShell -ArgumentList "-File C:\tmp\setup.ps1" `
 if ($sP.ExitCode -ne 0) {
     # If the exit code is not 0, stop the process
     Stop-Process -Id $sP.Id
+    exit 0
 } else {
     Write-Host "Installation completed successfully."
+    exit 0
 }
