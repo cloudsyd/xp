@@ -69,11 +69,16 @@ $argumentsXml.Save("$($tmp)Arguments.xml");
 $installProcess = Start-Process $installer.FullName `
   -ArgumentList "--quiet --license=$($license.FullName) --arguments=$($tmp)Arguments.xml" `
   -PassThru `
+  -Wait `
   -Verb runAs;
 
-$installProcess.WaitForExit();
-
-Write-Output "Installation of XP"
+# Check the exit code
+if ($installProcess.ExitCode -ne 0) {
+    # If the exit code is not 0, stop the process
+    Stop-Process -Id $installProcess.Id
+} else {
+    Write-Host "Installation completed successfully."
+}
 
 }
 $block > C:\tmp\setup.ps1
@@ -87,8 +92,13 @@ $c = New-Object System.Management.Automation.PSCredential($Username, $securePass
 # Start the PowerShell process with the specified script and credentials
 $sP = Start-Process PowerShell -ArgumentList "-File C:\tmp\setup.ps1" `
 -Credential $c `
--PassThru;
+-PassThru `
+-Wait;
 
-$sP.WaitForExit();
-
-Write-Output "All done"
+# Check the exit code
+if ($sP.ExitCode -ne 0) {
+    # If the exit code is not 0, stop the process
+    Stop-Process -Id $sP.Id
+} else {
+    Write-Host "Installation completed successfully."
+}
