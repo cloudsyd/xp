@@ -68,19 +68,22 @@ $argumentsXml.Save("$($tmp)Arguments.xml");
 
 $installProcess = Start-Process $installer.FullName `
   -ArgumentList "--quiet --license=$($license.FullName) --arguments=$($tmp)Arguments.xml" `
-  -PassThru `
-  -Wait;
-  # -Verb runAs;
+  -PassThru;
+Wait-Process $installProcess.Id
 
-# Check the exit code
-if ($installProcess.ExitCode -ne 0) {
-    # If the exit code is not 0, stop the process
-    Stop-Process -Id $installProcess.Id
-    Start-Sleep -Seconds 10
-    Restart-Computer -Force
-} else {
-    Write-Host "Installation completed successfully."
+# Check return code from the VMS installation
+# If error code is 0 everything went fine.
+# If error code is 3010 it means that system needs to be restarted.
+$installerLog = "$env:ProgramData\Milestone\Installer\installer.log"
+$errorContent = (Get-Content $installerLog)[-1].Split(' ')[-1]
+$result = If ($errorContent -eq 0 -or $errorContent -eq 3010) { "true" } Else { "false" }
+
+if ($result -eq "false")
+{
+throw "Error occured during the installation of Milestone XProtect - please check the logs for more information"
 }
+
+Restart-Computer -Force
 
 }
 $block > C:\tmp\setup.ps1
