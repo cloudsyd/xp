@@ -88,6 +88,7 @@ $task = Get-ScheduledTask -TaskName "t"
 if ($task.State -eq "Running") {
     # If the task is running, exit the script
     Write-Host "Task is running, exiting script."
-    exit
+    exit 0
 }
+
 
