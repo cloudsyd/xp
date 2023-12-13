@@ -73,11 +73,21 @@ Wait-Process $installProcess.Id
 }
 $block > C:\tmp\setup.ps1
 
-# Convert the password to a secure string
-
-
-$Tr= New-ScheduledTaskTrigger -Once -At (Get-Date).AddSeconds(200)
+$Tr= New-ScheduledTaskTrigger -Once -At (Get-Date).AddSeconds(180)
 $Us= "$Username"
 $p= $Password
 $Ac= New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "C:\tmp\setup.ps1"
 Register-ScheduledTask -TaskName "t" -Trigger $Tr -User $Us -Password $p -Action $Ac -RunLevel Highest
+
+Start-Sleep -Seconds 200
+
+# Get the task
+$task = Get-ScheduledTask -TaskName "t"
+
+# Check the task's state
+if ($task.State -eq "Running") {
+    # If the task is running, exit the script
+    Write-Host "Task is running, exiting script."
+    exit
+}
+
