@@ -70,42 +70,14 @@ $installProcess = Start-Process $installer.FullName `
   -ArgumentList "--quiet --license=$($license.FullName) --arguments=$($tmp)Arguments.xml" `
   -PassThru;
 Wait-Process $installProcess.Id
-
-# Check return code from the VMS installation
-# If error code is 0 everything went fine.
-# If error code is 3010 it means that system needs to be restarted.
-$installerLog = "$env:ProgramData\Milestone\Installer\installer.log"
-$errorContent = (Get-Content $installerLog)[-1].Split(' ')[-1]
-$result = If ($errorContent -eq 0 -or $errorContent -eq 3010) { "true" } Else { "false" }
-
-if ($result -eq "false")
-{
-throw "Error occured during the installation of Milestone XProtect - please check the logs for more information"
-}
-exit 0
-Restart-Computer -Force
-
 }
 $block > C:\tmp\setup.ps1
 
 # Convert the password to a secure string
-$securePassword = ConvertTo-SecureString $Password -AsPlainText -Force
 
-# Create a credential object
-$c = New-Object System.Management.Automation.PSCredential($Username, $securePassword)
 
-# Start the PowerShell process with the specified script and credentials
-$sP = Start-Process PowerShell -ArgumentList "-File C:\tmp\setup.ps1" `
--Credential $c `
--PassThru `
--Wait;
-
-# Check the exit code
-if ($sP.ExitCode -ne 0) {
-    # If the exit code is not 0, stop the process
-    Stop-Process -Id $sP.Id
-    exit 0
-} else {
-    Write-Host "Installation completed successfully."
-    exit 0
-}
+$Tr= New-ScheduledTaskTrigger -Once -At (Get-Date).AddSeconds(200)
+$Us= "$Username"
+$p= $Password
+$Ac= New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "C:\tmp\setup.ps1"
+Register-ScheduledTask -TaskName "t" -Trigger $Tr -User $Us -Password $p -Action $Ac -RunLevel Highest
