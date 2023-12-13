@@ -69,13 +69,15 @@ $argumentsXml.Save("$($tmp)Arguments.xml");
 $installProcess = Start-Process $installer.FullName `
   -ArgumentList "--quiet --license=$($license.FullName) --arguments=$($tmp)Arguments.xml" `
   -PassThru `
-  -Wait `
-  -Verb runAs;
+  -Wait;
+  # -Verb runAs;
 
 # Check the exit code
 if ($installProcess.ExitCode -ne 0) {
     # If the exit code is not 0, stop the process
     Stop-Process -Id $installProcess.Id
+    Start-Sleep -Seconds 10
+    Restart-Computer -Force
 } else {
     Write-Host "Installation completed successfully."
 }
