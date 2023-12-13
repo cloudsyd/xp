@@ -7,6 +7,8 @@ $Password
 )
 
 $block = {
+Try
+{
 $tmp = "C:\tmp\";
 
 $installer = Get-ChildItem $tmp `
@@ -83,8 +85,15 @@ if ($result -eq "false")
 throw "Error occured during the installation of Milestone XProtect - please check the logs for more information"
 }
 
-Restart-Computer -Force
-
+exit 0
+}
+Catch {
+# If something goes wrong during the installation process generate a log file in desktop
+$errorMessage = $_ | Out-String
+$output = "$env:USERPROFILE\Desktop\"
+New-Item -Path $output -Name "VMS Error Log.txt" -ItemType "file" -Value "$($errorMessage)"
+exit 1
+}
 }
 $block > C:\tmp\setup.ps1
 
@@ -104,6 +113,8 @@ $sP = Start-Process PowerShell -ArgumentList "-File C:\tmp\setup.ps1" `
 if ($sP.ExitCode -ne 0) {
     # If the exit code is not 0, stop the process
     Stop-Process -Id $sP.Id
+    exit 1
 } else {
     Write-Host "Installation completed successfully."
+    exit 0
 }
