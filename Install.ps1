@@ -85,7 +85,7 @@ $task = Get-ScheduledTask -TaskName "t"
 
 # Loop until the task state is ready
 while ($true) {
-    $taskState = (Get-ScheduledTaskInfo -InputObject $task).State
+    $taskState = $task.State
     if ($taskState -eq "Ready") {
         Write-Output "Task is ready."
         exit 0
