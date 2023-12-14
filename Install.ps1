@@ -81,10 +81,9 @@ Register-ScheduledTask -TaskName "t" -Trigger $Tr -User $Us -Password $p -Action
 
 Start-Sleep -Seconds 250
 
-$task = Get-ScheduledTask -TaskName "t"
-
 # Loop until the task state is ready
 while ($true) {
+    $task = Get-ScheduledTask -TaskName "t"
     $taskState = $task.State
     if ($taskState -eq "Ready") {
         Write-Output "Task is ready."
