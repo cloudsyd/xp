@@ -79,16 +79,20 @@ $p= $Password
 $Ac= New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "C:\tmp\setup.ps1"
 Register-ScheduledTask -TaskName "t" -Trigger $Tr -User $Us -Password $p -Action $Ac -RunLevel Highest
 
-Start-Sleep -Seconds 200
+Start-Sleep -Seconds 250
 
-# Get the task
 $task = Get-ScheduledTask -TaskName "t"
 
-# Check the task's state
-if ($task.State -eq "Running") {
-    # If the task is running, exit the script
-    Write-Host "Task is running, exiting script."
-    exit 0
+# Loop until the task state is ready
+while ($true) {
+    $taskState = (Get-ScheduledTaskInfo -InputObject $task).State
+    if ($taskState -eq "Ready") {
+        Write-Output "Task is ready."
+        exit 0
+    } else {
+        Write-Output "Task is not ready yet. Current state: $taskState"
+        Start-Sleep -Seconds 10
+    }
 }
 
 
