@@ -79,15 +79,10 @@ $p= $Password
 $Ac= New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "C:\tmp\setup.ps1"
 Register-ScheduledTask -TaskName "t" -Trigger $Tr -User $Us -Password $p -Action $Ac -RunLevel Highest
 
-Start-Sleep -Seconds 250
+Start-Sleep -Seconds 200
 
-do {
-    Start-Sleep -Seconds 10
-    $task = Get-ScheduledTask -TaskName "t"
-} while ($task.State -ne "Ready" -and $task.State -ne "Disabled")
-$TaskResult = (Get-ScheduledTaskInfo -TaskName $TaskName).LastTaskResult
-Write-Output "Script exited with code: $TaskResult"
-#Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false
-exit $TaskResult
+while ((Get-ScheduledTask -TaskName 't').State  -eq 'Ready') {
+Exit 0
+  }
 
 
