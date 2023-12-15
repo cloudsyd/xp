@@ -81,17 +81,13 @@ Register-ScheduledTask -TaskName "t" -Trigger $Tr -User $Us -Password $p -Action
 
 Start-Sleep -Seconds 250
 
-# Loop until the task state is ready
-while ($true) {
+do {
+    Start-Sleep -Seconds 10
     $task = Get-ScheduledTask -TaskName "t"
-    $taskState = $task.State
-    if ($taskState -eq "Ready") {
-        Write-Output "Task is ready."
-        exit 0
-    } else {
-        Write-Output "Task is not ready yet. Current state: $taskState"
-        Start-Sleep -Seconds 10
-    }
-}
+} while ($task.State -ne "Ready" -and $task.State -ne "Disabled")
+$TaskResult = (Get-ScheduledTaskInfo -TaskName $TaskName).LastTaskResult
+Write-Output "Script exited with code: $TaskResult"
+#Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false
+exit $TaskResult
 
 
