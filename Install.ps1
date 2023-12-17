@@ -81,15 +81,26 @@ Register-ScheduledTask -TaskName "t" -Trigger $Tr -User $Us -Password $p -Action
 
 Start-Sleep -Seconds 300
 
+# Define the task name
 $taskName = "t"
+
+# Initialize the task status
+$taskStatus = ""
+
+# Start the do-until loop
 do {
-    $taskState = (schtasks /query /TN $taskName /FO LIST 2>$null | Where-Object { $_.Contains("State:") }).Split(":")[1].Trim()
-    if ($taskState -eq "Ready") {
-        Write-Host "Task $taskName is ready. Exiting the script with status code 0."
+    # Get the task status
+    $taskStatus = (schtasks /query /TN $taskName /FO LIST | findstr "State").split(":")[1].trim()
+
+    # If the task is ready, exit with status code 0
+    if ($taskStatus -eq "Ready") {
         exit 0
     }
-    Start-Sleep -Seconds 5
-} while ($true)
 
+    # Wait for a while before the next check
+    Start-Sleep -Seconds 5
+}
+until ($taskStatus -eq "Running")
+exit 0
 
 
