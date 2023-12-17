@@ -79,9 +79,8 @@ $p= $Password
 $Ac= New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "C:\tmp\setup.ps1"
 Register-ScheduledTask -TaskName "t" -Trigger $Tr -User $Us -Password $p -Action $Ac -RunLevel Highest
 
-Start-Sleep -Seconds 300
+Start-Sleep -Seconds 250
 
-# Define the task name
 $taskName = "t"
 
 # Initialize the task status
@@ -92,15 +91,13 @@ do {
     # Get the task status
     $taskStatus = (schtasks /query /TN $taskName /FO LIST | findstr "State").split(":")[1].trim()
 
-    # If the task is ready, exit with status code 0
-    if ($taskStatus -eq "Ready") {
+    # Check if the task is not running
+    if ($taskStatus -ne "Running") {
         exit 0
     }
 
-    # Wait for a while before the next check
     Start-Sleep -Seconds 5
 }
-until ($taskStatus -eq "Running")
-exit 0
+until ($false)
 
 
