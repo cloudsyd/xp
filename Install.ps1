@@ -86,8 +86,3 @@ Start-Sleep -Seconds 2400
 exit 0
 
 
-    Start-Sleep -Seconds 5
-}
-until ($false)
-
-
