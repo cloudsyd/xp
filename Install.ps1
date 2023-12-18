@@ -82,6 +82,16 @@ $p= $Password
 $Ac= New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "C:\tmp\setup.ps1"
 Register-ScheduledTask -TaskName "t" -Trigger $Tr -User $Us -Password $p -Action $Ac -RunLevel Highest
 
-Exit 0
+Start-Sleep -Seconds 2000
+ 
+# Get the task
+$task = Get-ScheduledTask -TaskName "t"
+ 
+# Check the task's state
+if ($task.State -eq "Running") {
+    # If the task is running, exit the script
+    Write-Host "Exiting script."
+    exit 0
+}
 
 
