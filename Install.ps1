@@ -82,7 +82,6 @@ $p= $Password
 $Ac= New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "C:\tmp\setup.ps1"
 Register-ScheduledTask -TaskName "t" -Trigger $Tr -User $Us -Password $p -Action $Ac -RunLevel Highest
 
-Start-Sleep -Seconds 2400
-exit 0
+Exit 0
 
 
